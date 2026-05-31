@@ -17,8 +17,16 @@ const posts = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
+
+
+		
 			main {
 				width: 960px;
+				 min-height: calc(100vh - 200px);
+                 display: flex;
+                 flex-direction: column;
+                 justify-content: center; /* 把 Welcome 黑框死死按在正中间 */
+                 align-items: center;
 			}
 			ul {
 				display: flex;
@@ -129,3 +137,4 @@ const posts = (await getCollection('blog')).sort(
 		<Footer />
 	</body>
 </html>
+

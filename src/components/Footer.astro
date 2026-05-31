@@ -6,7 +6,7 @@ const today = new Date();
 	&copy; {today.getFullYear()} Romuda. All rights reserved.
 	<div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
-			<span class="sr-only">Follow Astro on Mastodon</span>
+			<span class="sr-only">Follow Romuda on Mastodon</span>
 			<svg
 				viewBox="0 0 16 16"
 				aria-hidden="true"
@@ -19,8 +19,9 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
-		<a href="https://twitter.com/astrodotbuild" target="_blank">
-			<span class="sr-only">Follow Astro on Twitter</span>
+
+		<a href="https://twitter.com/" target="_blank">
+			<span class="sr-only">Follow Romuda on Twitter</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/twitter"
 				><path
 					fill="currentColor"
@@ -28,8 +29,9 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
+
 		<a href="https://github.com/fk-cmn" target="_blank">
-			<span class="sr-only">Go to Astro's GitHub repo</span>
+			<span class="sr-only">Go to Romuda's GitHub repo</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github"
 				><path
 					fill="currentColor"
@@ -39,11 +41,12 @@ const today = new Date();
 		</a>
 	</div>
 </footer>
+
 <style>
 	footer {
 		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
+		background: transparent !important; /* 强制透明背景，去除白色渐变狗皮膏药 */
+		color: #e0e0e0; /* 将版权文字改为亮灰色，在暗色背景上更清晰 */
 		text-align: center;
 	}
 	.social-links {
@@ -52,11 +55,19 @@ const today = new Date();
 		gap: 1em;
 		margin-top: 1em;
 	}
-	.social-links a {
+	
+	/* 1. 直接锁定 footer 里的所有 a 标签（图标） */
+	footer a {
 		text-decoration: none;
-		color: rgb(var(--gray));
+		color: #4da6ff !important; /* 清透高级的亮蓝色 */
+		transition: all 0.3s ease; /* 平滑的过渡动画 */
+		display: inline-block; /* 保证缩放动画不被挤压 */
 	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+
+	/* 2. 悬停状态：发光 + 放大 */
+	footer a:hover {
+		color: #00e5ff !important; /* 赛博青蓝 */
+		transform: scale(1.2); /* 放大 1.2 倍 */
+		filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.8)); /* 加上显眼的霓虹光晕 */
 	}
 </style>
