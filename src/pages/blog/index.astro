@@ -53,19 +53,36 @@ const posts = (await getCollection('blog')).sort(
 			ul li a {
 				display: block;
 			}
+			
+			/* =================================================== */
+			/* 1. 核心修改：将博客标题默认颜色从黑色改为纯白 */
+			/* =================================================== */
 			.title {
 				margin: 0;
-				color: rgb(var(--black));
+				color: #ffffff; /* 彻底告别原模板的黑色，拥抱纯白 */
 				line-height: 1;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 加点阴影，防止被花哨的封面图背景吃掉 */
 			}
+			
 			.date {
 				margin: 0;
 				color: rgb(var(--gray));
 			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
+			
+			/* =================================================== */
+			/* 2. 核心修改：鼠标悬停（Hover）或点击激活时变成深蓝色 */
+			/* =================================================== */
+			ul li a:hover .title,
+			ul li a:focus .title,
+			ul li a:active .title {
+				color: #2337ff; /* 激活时变为高饱和度的极客深蓝 */
+				text-shadow: 0 0 8px rgba(35, 55, 255, 0.6); /* 附赠微弱的霓虹发光动效 */
 			}
+			
+			ul li a:hover .date {
+				color: #60a5fa; /* 日期悬停时变成淡蓝色，与深蓝交相辉映 */
+			}
+			
 			ul a:hover img {
 				box-shadow: var(--box-shadow);
 			}

@@ -6,55 +6,157 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
-
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+// 新增 headings 类型定义
+type Props = CollectionEntry<'blog'>['data'] & {
+	headings?: { depth: number; slug: string; text: string }[];
+};
+// 解构出 headings
+const { title, description, pubDate, updatedDate, heroImage, headings } = Astro.props;
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
-		<style>
+		<style is:global>
 			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
+				/* ================= 新增：加宽核心代码 ================= */
+				width: calc(100% - 2em) !important; /* 保证在手机端左右也能留出一小圈缝隙 */
+				max-width: 900px !important;       /* 将最大宽度从原先的 720px 拓宽到 900px */
+				margin: 0 auto !important;          /* 保证这个加宽后的白板始终完美居中 */
+				/* =================================================== */
+
+				background: rgba(255, 255, 255, 0.92) !important; /* 92% 的高饱和纯白，确保文字绝对清晰 */
+				backdrop-filter: blur(16px) saturate(180%); /* 加大模糊，透出背后霓虹涂鸦的幻彩感 */
+				-webkit-backdrop-filter: blur(16px) saturate(180%);
+				border: 1px solid rgba(255, 255, 255, 0.6); /* 白色边缘高光，增加晶莹剔透的厚度感 */
+				box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15); /* 柔和暗影，将卡片平稳托起 */
+				border-radius: 16px;
+				padding: 3em 2em;
+				color: #1a1f26 !important; /* 极深灰黑色文字，比死黑更具高级印刷质感 */
+			}
+
+			/* 2. 标题文字全面染黑 */
+			main h1, main h2, main h3, main h4, main h5, main h6 {
+				color: #0f141c !important;
+				text-shadow: none !important; /* 移除之前的深色投影 */
+				margin-top: 1.5em;
+				margin-bottom: 0.6em;
+			}
+
+			/* 3. 让文章内的普通段落和列表也老老实实变黑 */
+			main p, main li {
+				color: #242930 !important;
+			}
+
+			/* =================================================== */
+			/* 1. 行内代码（红色高亮）优化：字体加大，间距微调 */
+			/* =================================================== */
+			main :not(pre) > code {
+				background: rgba(0, 0, 0, 0.06) !important;
+				color: #eb5757 !important;
+				font-size: 1.05em !important; 
+				padding: 0.2rem 0.5rem !important;
+				margin: 0 2px !important;
+				border-radius: 4px;
+				font-family: monospace;
+			}
+
+			/* =================================================== */
+			/* 2. 引用块（blockquote）优化：缩小占地，更显精致 */
+			/* =================================================== */
+			main blockquote {
+				background: rgba(0, 0, 0, 0.03) !important;
+				border-left: 4px solid #2337ff !important;
+				padding: 0.5em 1em !important; 
+				margin: 0.8em 0 !important; 
+				border-radius: 0 6px 6px 0;
+			}
+			main blockquote p {
+				color: #556375 !important;
+				font-style: italic;
+				font-size: 0.95em !important; 
+				margin: 0 !important;
+			}
+
+			/* =================================================== */
+			/* 3. 新增：正文与侧边栏目录的双栏布局 */
+			/* =================================================== */
+			.content-wrapper {
+				display: flex;
+				gap: 3rem; /* 正文和目录之间的间距 */
+				align-items: flex-start; /* 必须加这个，否则 sticky 吸顶不生效 */
+				margin-top: 2rem;
+			}
+			
+			.prose {
+				flex: 1; /* 左侧正文占据剩余全部空间 */
+				min-width: 0; /* 防止长代码块撑爆容器 */
+			}
+
+			/* 侧边栏整体占位 */
+			.toc {
+				width: 240px; /* 目录栏的固定宽度 */
+				flex-shrink: 0;
+			}
+
+			/* 核心：吸顶悬浮效果 */
+			.toc-sticky {
+				position: sticky;
+				top: 6rem; /* 向下滚动时，距离屏幕顶部的距离 */
+				max-height: calc(100vh - 8rem); /* 限制最高高度，防止目录太长超出屏幕 */
+				overflow-y: auto; /* 目录太长时可以在内部滚动 */
+				padding-left: 1.5rem;
+				border-left: 2px solid rgba(0, 0, 0, 0.08); /* 左侧一条淡淡的分割线 */
+			}
+
+			/* 目录内部文字排版 */
+			.toc-sticky h4 {
+				margin-top: 0;
+				font-size: 1.1rem;
+				color: #0f141c !important;
+				letter-spacing: 2px;
+			}
+			.toc-sticky ul {
+				list-style: none;
+				padding: 0;
 				margin: 0;
 			}
-			.hero-image {
-				width: 100%;
+			.toc-sticky li {
+				margin-bottom: 0.4rem;
 			}
-			.hero-image img {
+			.toc-sticky a {
 				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				color: #556375 !important;
+				text-decoration: none;
+				font-size: 0.9rem;
+				line-height: 1.4;
+				transition: all 0.2s ease;
 			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
+			.toc-sticky a:hover {
+				color: #2337ff !important; /* 悬停变成电光蓝 */
+				transform: translateX(4px); /* 悬停时文字微微向右浮动，交互感拉满 */
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
+
+			/* 目录层级缩进（h2, h3, h4） */
+			.toc-level-1, .toc-level-2 { font-weight: 600; margin-top: 0.8rem; }
+			.toc-level-3 { margin-left: 1rem; font-size: 0.85rem; }
+			.toc-level-4 { margin-left: 2rem; font-size: 0.8rem; }
+
+			/* 手机端适配：屏幕变窄时，目录自动跑到正文上方，取消悬浮 */
+			@media (max-width: 1024px) {
+				.content-wrapper { flex-direction: column-reverse; } 
+				.toc { width: 100%; }
+				.toc-sticky {
+					position: static;
+					max-height: none;
+					border-left: none;
+					padding-left: 0;
+					border-bottom: 1px solid rgba(0,0,0,0.08);
+					padding-bottom: 1.5rem;
+				}
 			}
 		</style>
 	</head>
-
 	<body>
 		<Header />
 		<main>
@@ -62,24 +164,42 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				<div class="hero-image">
 					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
+				<div class="title">
+					<div class="date">
+						<FormattedDate date={pubDate} />
+						{updatedDate && (
+							<div class="last-updated-on">
+								Last updated on <FormattedDate date={updatedDate} />
+							</div>
+						)}
 					</div>
-					<slot />
+					<h1>{title}</h1>
+					<hr />
 				</div>
-			</article>
+				
+				<div class="content-wrapper">
+					
+					<div class="prose">
+						<slot />
+					</div>
+
+					{headings && headings.length > 0 && (
+						<aside class="toc">
+							<div class="toc-sticky">
+								<h4>目录</h4>
+								<ul>
+									{headings.map((heading) => (
+										<li class={`toc-level-${heading.depth}`}>
+											<a href={`#${heading.slug}`}>{heading.text}</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						</aside>
+					)}
+
+				</div>
+				</article>
 		</main>
 		<Footer />
 	</body>

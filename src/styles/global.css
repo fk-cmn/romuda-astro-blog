@@ -17,24 +17,74 @@
 		0 16px 32px rgba(var(--gray), 33%);
 }
 body {
-	font-family: var(--font-atkinson);
-	margin: 0;
-	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
+	background-image: url('/graffiti.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    color: #f1f5f9;
+}
+.header-glass {
+  /* 悬浮在最顶层 */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  /* 毛玻璃效果 */
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* 底部边框微光，增加高级感 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  /* 内边距与布局 */
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  
+  /* 确保过渡平滑 */
+  transition: all 0.3s ease;
+}
+
+/* 让导航栏里的文字也跟着变白，保证阅读性 */
+.header-glass a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 1.5rem;
+}
+
+.header-glass a:hover {
+  color: #00d2ff; /* 悬停时显示电光蓝，呼应你的大标题 */
 }
 main {
 	width: 720px;
 	max-width: calc(100% - 2em);
-	margin: auto;
+	margin: 4rem auto 2rem auto;
 	padding: 3em 1em;
+	/* ================== */
+   /* 2. 新增的毛玻璃特效代码 */
+  /* ================== */
+  background: rgba(20, 20, 20, 0.6); 
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(3px); 
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  background: rgba(0, 0, 0, 0.7); /* 把这里的 0.6 改大一点，背景会更黑，文字更清晰 */
+
 }
+.strikethrough-blue {
+  /* 划线颜色改为深蓝色 */
+  text-decoration-color: #003366; 
+  /* 划线粗细 (可选，让线条更明显一点) */
+  text-decoration-thickness: 2px;
+  /* 划线样式 */
+  text-decoration-line: line-through;
+  /* 文字本身稍微调低一点透明度，让划掉的效果更符合视觉习惯 */
+  opacity: 0.8;
+}
+
 h1,
 h2,
 h3,
@@ -42,9 +92,23 @@ h4,
 h5,
 h6 {
 	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
+	color: #ffffff;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 增加一点阴影，防止被背景吃掉 */
 	line-height: 1.2;
 }
+/* 正文段落：适当加深一点对比度，或者加一点点白色亮度 */
+p {
+  color: #e2e8f0; /* 比纯白稍微柔和一点的灰白色，读起来不累眼 */
+  line-height: 1.6;
+}
+
+/* 如果 About 页面里有链接，给链接加个明显的亮色，方便点击 */
+.prose a {
+  color: #60a5fa; /* 亮蓝色，在深色背景下非常显眼 */
+  text-decoration: underline;
+}
+
+
 h1 {
 	font-size: 3.052em;
 }
