@@ -15,11 +15,12 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Header />
 		
 		<main>
-			<h1>Welcome to Romuda's night.</h1>
-			<p>
-				这是我的个人博客，用于记录一些杂乱无章的随笔以及CS被拷打的历程。
-			</p>
-			<p class="strikethrough-blue">（其实都是胡言乱语罢了）</p>
+			 <div class="glass-card">
+             <h1>Welcome to Romuda's night.</h1>
+             <p class="desc-text">这是我的个人博客，用于记录一些杂乱无章的随笔以及CS被拷打的历程。</p>
+             <p class="desc-text"><del>（其实都是胡言乱语罢了）</del></p>
+             <!-- 其他内容 -->
+             </div>
 			
 			<div class="source-code-wrapper">
 				<span class="credit-text">CSS provided by Gemini & Romuda</span>
@@ -79,6 +80,12 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				box-shadow: 0 6px 20px rgba(35, 55, 255, 0.4); /* 蓝色发光特效 */
 				transform: translateY(-3px); /* 悬停时上浮 */
 			}
+			.desc-text {
+                text-align: center;
+                /* 如果你的文字在容器里显得太宽而没有自动换行，也可以加个最大宽度并居中 */
+                /* max-width: 80%; */
+                /* margin: 0 auto; */
+            }
 		</style>
 
 		<Footer />
