@@ -3,6 +3,8 @@ title: "单源最短路径算法"
 description: "DAG、Dijkstra 及 Bellman-Ford 算法。"
 pubDate: 2026-05-20
 heroImage: "./img-f.png" 
+tags: ['算法导论', 'CS']
+
 ---
 
 **引入：**

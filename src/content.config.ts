@@ -14,6 +14,8 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
+			// 👇 新增这一行：定义 tags 为字符串数组，并且是可选的
+		    tags: z.array(z.string()).optional(),
 		}),
 });
 

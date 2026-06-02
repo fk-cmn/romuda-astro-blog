@@ -12,7 +12,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
 
 const { title, description, pubDate, updatedDate, heroImage, headings } = Astro.props;
 
-// ====== 终极双保险：同时判断 URL 和 标题，确保绝对命中 About 页面 ======
+// 判断是否是 About 页面
 const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathname.includes('about');
 ---
 
@@ -20,18 +20,14 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 	<head>
 		<BaseHead title={title} description={description} />
 		<style is:global>
-			/* =================================================== */
-			/* 1. 基础骨架容器（保持居中和加宽） */
-			/* =================================================== */
+			/* 基础骨架容器 */
 			main {
 				width: calc(100% - 2em) !important;
-				max-width: 900px !important;
+				max-width: 720px !important;
 				margin: 0 auto !important;
 			}
 
-			/* =================================================== */
-			/* 2. 博客专属：硬核纯白毛玻璃 */
-			/* =================================================== */
+			/* 博客专属：白毛玻璃 */
 			main.blog-white-theme {
 				background: rgba(255, 255, 255, 0.92) !important; 
 				backdrop-filter: blur(16px) saturate(180%);
@@ -43,16 +39,13 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				color: #1a1f26 !important; 
 			}
 
-			/* 博客文章的深色文字和高亮 */
 			main.blog-white-theme h1, main.blog-white-theme h2, main.blog-white-theme h3, main.blog-white-theme h4, main.blog-white-theme h5, main.blog-white-theme h6 {
 				color: #0f141c !important;
 				text-shadow: none !important;
 				margin-top: 1.5em;
 				margin-bottom: 0.6em;
 			}
-			main.blog-white-theme p, main.blog-white-theme li {
-				color: #242930 !important;
-			}
+			main.blog-white-theme p, main.blog-white-theme li { color: #242930 !important; }
 			main.blog-white-theme :not(pre) > code {
 				background: rgba(0, 0, 0, 0.06) !important;
 				color: #eb5757 !important;
@@ -76,91 +69,118 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				margin: 0 !important;
 			}
 
-			/* =================================================== */
-			/* 3. 新增！About 页面专属：高级暗黑透光毛玻璃 */
-			/* =================================================== */
+			/* About 页面专属：暗黑透光毛玻璃 */
 			main.about-dark-theme {
-				background: rgba(0, 0, 0, 0.35) !important; /* 低调的暗黑半透明，完美融合图片光影 */
+				background: rgba(0, 0, 0, 0.35) !important;
 				backdrop-filter: blur(12px) saturate(150%);
 				-webkit-backdrop-filter: blur(12px) saturate(150%);
 				border: 1px solid rgba(255, 255, 255, 0.1); 
 				box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 				border-radius: 16px;
 				padding: 3em 2em;
-				color: #e0e0e0 !important; /* 字体变成亮色，在深色背景下清晰可见 */
+				color: #e0e0e0 !important; 
 			}
 			
-			/* About 页面的大标题变成纯白加微弱发光 */
 			main.about-dark-theme h1, main.about-dark-theme h2, main.about-dark-theme h3 {
 				color: #ffffff !important;
 				text-shadow: 0 2px 8px rgba(0,0,0,0.8) !important;
 			}
 
+			.content-wrapper { margin-top: 2rem; }
+			.prose { width: 100%; max-width: 100%; }
+
 			/* =================================================== */
-			/* 4. 侧边栏与正文布局（保持原样） */
+			/* 悬浮目录按钮（你要求的白色小块） */
 			/* =================================================== */
-			.content-wrapper {
-				display: flex;
-				gap: 3rem; 
-				align-items: flex-start; 
-				margin-top: 2rem;
+			.toc-toggle-btn {
+				position: fixed !important; /* 强制悬浮 */
+				bottom: 30px !important;
+				right: 30px !important;
+				background: #ffffff !important;
+				color: #1a1f26 !important;
+				border: 1px solid rgba(0, 0, 0, 0.08) !important;
+				border-radius: 8px !important; /* 方块圆角 */
+				padding: 10px 18px !important;
+				font-size: 15px !important;
+				font-weight: bold !important;
+				letter-spacing: 2px !important;
+				cursor: pointer !important;
+				box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+				z-index: 9999 !important; /* 确保在最顶层 */
+				transition: all 0.2s ease !important;
 			}
-			.prose {
-				flex: 1; 
-				min-width: 0; 
+			.toc-toggle-btn:hover {
+				transform: translateY(-3px) !important;
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
 			}
-			.toc {
-				width: 240px; 
-				flex-shrink: 0;
+			
+			/* =================================================== */
+			/* 右侧目录抽屉框 */
+			/* =================================================== */
+			.toc-drawer {
+				position: fixed !important;
+				top: 0 !important;
+				right: -360px !important; /* 默认隐藏在屏幕外 */
+				width: 320px !important;
+				height: 100vh !important;
+				background: rgba(255, 255, 255, 0.95) !important;
+				backdrop-filter: blur(20px) !important;
+				-webkit-backdrop-filter: blur(20px) !important;
+				box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15) !important;
+				z-index: 10000 !important;
+				transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+				padding: 2.5rem 1.5rem !important;
+				overflow-y: auto !important;
 			}
-			.toc-sticky {
-				position: sticky;
-				top: 6rem; 
-				max-height: calc(100vh - 8rem); 
-				overflow-y: auto; 
-				padding-left: 1.5rem;
-				border-left: 2px solid rgba(0, 0, 0, 0.08); 
+			.toc-drawer.open { right: 0 !important; }
+			
+			/* 抽屉头部 */
+			.toc-drawer-header {
+				display: flex !important;
+				justify-content: space-between !important;
+				align-items: center !important;
+				margin-bottom: 1.5rem !important;
+				padding-bottom: 1rem !important;
+				border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
 			}
-			.toc-sticky h4 {
-				margin-top: 0;
-				font-size: 1.1rem;
-				color: #0f141c !important;
-				letter-spacing: 2px;
-			}
-			.toc-sticky ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
-			.toc-sticky li {
-				margin-bottom: 0.4rem;
-			}
-			.toc-sticky a {
-				display: block;
+			.toc-drawer-header h4 { margin: 0 !important; font-size: 1.2rem !important; color: #0f141c !important; letter-spacing: 1px !important; }
+			.toc-close-btn { background: none !important; border: none !important; font-size: 2rem !important; cursor: pointer !important; color: #556375 !important; line-height: 1 !important; padding: 0 !important; }
+			
+			/* 抽屉内链接样式 */
+			.toc-drawer ul { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+			.toc-drawer li { margin-bottom: 0.6rem !important; }
+			.toc-drawer a {
+				display: block !important;
 				color: #556375 !important;
-				text-decoration: none;
-				font-size: 0.9rem;
-				line-height: 1.4;
-				transition: all 0.2s ease;
+				text-decoration: none !important;
+				font-size: 0.95rem !important;
+				line-height: 1.5 !important;
+				transition: all 0.2s ease !important;
 			}
-			.toc-sticky a:hover {
-				color: #2337ff !important; 
-				transform: translateX(4px); 
+			.toc-drawer a:hover { color: #2337ff !important; transform: translateX(6px) !important; font-weight: bold !important; }
+			.toc-level-1, .toc-level-2 { font-weight: 600 !important; margin-top: 1rem !important; }
+			.toc-level-3 { margin-left: 1.2rem !important; font-size: 0.9rem !important; }
+			.toc-level-4 { margin-left: 2.4rem !important; font-size: 0.85rem !important; }
+
+			/* 背景黑色半透明遮罩 */
+			.toc-overlay {
+				position: fixed !important;
+				top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+				background: rgba(0, 0, 0, 0.4) !important;
+				backdrop-filter: blur(3px) !important;
+				z-index: 9998 !important;
+				opacity: 0 !important; visibility: hidden !important;
+				transition: all 0.3s ease !important;
 			}
-			.toc-level-1, .toc-level-2 { font-weight: 600; margin-top: 0.8rem; }
-			.toc-level-3 { margin-left: 1rem; font-size: 0.85rem; }
-			.toc-level-4 { margin-left: 2rem; font-size: 0.8rem; }
-			@media (max-width: 1024px) {
-				.content-wrapper { flex-direction: column-reverse; } 
-				.toc { width: 100%; }
-				.toc-sticky {
-					position: static;
-					max-height: none;
-					border-left: none;
-					padding-left: 0;
-					border-bottom: 1px solid rgba(0,0,0,0.08);
-					padding-bottom: 1.5rem;
+			.toc-overlay.open { opacity: 1 !important; visibility: visible !important; }
+
+			/* 手机端自适应 */
+			@media (max-width: 768px) {
+				main.blog-white-theme, main.about-dark-theme {
+					padding: 2em 1.2em !important;
 				}
+				.toc-drawer { width: 280px !important; right: -300px !important; }
+				.toc-toggle-btn { bottom: 20px !important; right: 20px !important; padding: 8px 15px !important; }
 			}
 		</style>
 	</head>
@@ -190,24 +210,64 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 					<div class="prose">
 						<slot />
 					</div>
-
-					{!isAboutPage && headings && headings.length > 0 && (
-						<aside class="toc">
-							<div class="toc-sticky">
-								<h4>目录</h4>
-								<ul>
-									{headings.map((heading) => (
-										<li class={`toc-level-${heading.depth}`}>
-											<a href={`#${heading.slug}`}>{heading.text}</a>
-										</li>
-									))}
-								</ul>
-							</div>
-						</aside>
-					)}
 				</div>
 			</article>
 		</main>
+
+		{!isAboutPage && headings && headings.length > 0 && (
+			<>
+				<button id="toc-btn" class="toc-toggle-btn" aria-label="打开目录">
+					目录
+				</button>
+
+				<div id="toc-drawer" class="toc-drawer">
+					<div class="toc-drawer-header">
+						<h4>目录</h4>
+						<button id="toc-close-btn" class="toc-close-btn">&times;</button>
+					</div>
+					<ul>
+						{headings.map((heading) => (
+							<li class={`toc-level-${heading.depth}`}>
+								<a href={`#${heading.slug}`}>{heading.text}</a>
+							</li>
+						))}
+					</ul>
+				</div>
+				<div id="toc-overlay" class="toc-overlay"></div>
+			</>
+		)}
+
 		<Footer />
+
+		<script>
+			function setupTOC() {
+				const tocBtn = document.getElementById('toc-btn');
+				const tocDrawer = document.getElementById('toc-drawer');
+				const tocCloseBtn = document.getElementById('toc-close-btn');
+				const tocOverlay = document.getElementById('toc-overlay');
+				const tocLinks = document.querySelectorAll('.toc-drawer a');
+
+				if (tocBtn && tocDrawer) {
+					const toggleToc = () => {
+						tocDrawer.classList.toggle('open');
+						tocOverlay.classList.toggle('open');
+					};
+
+					// 绑定点击事件
+					tocBtn.addEventListener('click', toggleToc);
+					tocCloseBtn.addEventListener('click', toggleToc);
+					tocOverlay.addEventListener('click', toggleToc);
+					
+					// 点击目录里的任意链接后，自动关掉目录
+					tocLinks.forEach(link => {
+						link.addEventListener('click', toggleToc);
+					});
+				}
+			}
+
+			// 支持 Astro 的普通加载，也兼容可能会用到的 ViewTransitions 平滑跳转
+			document.addEventListener('DOMContentLoaded', setupTOC);
+			document.addEventListener('astro:page-load', setupTOC);
+		</script>
 	</body>
 </html>

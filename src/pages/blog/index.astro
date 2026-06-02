@@ -1,140 +1,225 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { Image } from 'astro:assets';
 
+// 获取所有博客并按时间排序
 const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+// 提取所有不重复的标签
+const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
-
-
-		
 			main {
-				width: 960px;
-				 min-height: calc(100vh - 200px);
-                 display: flex;
-                 flex-direction: column;
-                 justify-content: center; /* 把 Welcome 黑框死死按在正中间 */
-                 align-items: center;
+				width: 1000px;
+				max-width: calc(100% - 2em);
+				margin: 2rem auto;
 			}
-			ul {
+			
+			/* =================================================== */
+			/* 1. 顶部分类过滤器（荧光胶囊风格） */
+			/* =================================================== */
+			.filter-container {
 				display: flex;
 				flex-wrap: wrap;
+				gap: 1rem;
+				justify-content: center;
+				margin-bottom: 3rem;
+				padding: 1rem;
+				background: rgba(0, 0, 0, 0.4);
+				backdrop-filter: blur(12px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 20px;
+			}
+			
+			.filter-btn {
+				background: rgba(255, 255, 255, 0.05);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				color: #e2e8f0;
+				padding: 6px 16px;
+				border-radius: 30px;
+				cursor: pointer;
+				font-size: 0.95rem;
+				font-weight: 600;
+				transition: all 0.3s ease;
+			}
+			
+			/* 鼠标悬停 & 选中状态的荧光蓝绿特效 */
+			.filter-btn:hover, .filter-btn.active {
+				background: rgba(0, 255, 255, 0.15);
+				border-color: #00ffff;
+				color: #ffffff;
+				box-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+				transform: translateY(-2px);
+			}
+
+			/* =================================================== */
+			/* 2. 博客文章卡片列表 */
+			/* =================================================== */
+			ul {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
 				gap: 2rem;
 				list-style-type: none;
 				margin: 0;
 				padding: 0;
 			}
-			ul li {
-				width: calc(50% - 1rem);
+			
+			/* 卡片的毛玻璃特效 */
+			li.post-card {
+				background: rgba(255, 255, 255, 0.05);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 16px;
+				overflow: hidden;
+				transition: all 0.3s ease;
+				/* 为了 JS 过滤时的丝滑淡入淡出 */
+				opacity: 1;
+				transform: scale(1);
 			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
+			li.post-card.hidden {
+				display: none;
 			}
-			ul li:first-child {
+			
+			li.post-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+				border-color: rgba(0, 255, 255, 0.4);
+			}
+
+			.post-card img {
 				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
+				height: 250px;
+				object-fit: cover;
+				margin-bottom: 0;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 			}
-			ul li:first-child img {
-				width: 100%;
+
+			.post-content {
+				padding: 1.5rem;
 			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			
-			/* =================================================== */
-			/* 1. 核心修改：将博客标题默认颜色从黑色改为纯白 */
-			/* =================================================== */
-			.title {
+
+			.post-content .title {
 				margin: 0;
-				color: #ffffff; /* 彻底告别原模板的黑色，拥抱纯白 */
-				line-height: 1;
-				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 加点阴影，防止被花哨的封面图背景吃掉 */
+				color: #ffffff;
+				line-height: 1.4;
+				font-size: 1.5rem;
 			}
-			
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
+
+			.post-content .date {
+				margin: 0.5rem 0;
+				color: #94a3b8;
+				font-size: 0.9rem;
 			}
-			
+
 			/* =================================================== */
-			/* 2. 核心修改：鼠标悬停（Hover）或点击激活时变成深蓝色 */
+			/* 3. 卡片上的小标签（Tag Pills） */
 			/* =================================================== */
-			ul li a:hover .title,
-			ul li a:focus .title,
-			ul li a:active .title {
-				color: #2337ff; /* 激活时变为高饱和度的极客深蓝 */
-				text-shadow: 0 0 8px rgba(35, 55, 255, 0.6); /* 附赠微弱的霓虹发光动效 */
+			.tags-list {
+				display: flex;
+				gap: 0.5rem;
+				margin-top: 1rem;
+				flex-wrap: wrap;
 			}
 			
-			ul li a:hover .date {
-				color: #60a5fa; /* 日期悬停时变成淡蓝色，与深蓝交相辉映 */
+			.tag-pill {
+				font-size: 0.75rem;
+				background: rgba(0, 255, 255, 0.1);
+				color: #00ffff;
+				padding: 2px 8px;
+				border-radius: 4px;
+				border: 1px solid rgba(0, 255, 255, 0.3);
 			}
+
+			a { text-decoration: none; }
 			
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
+			@media (max-width: 768px) {
+				ul { grid-template-columns: 1fr; }
 			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
+			<div class="filter-container">
+				<button class="filter-btn active" data-filter="all">全部 (All)</button>
+				{allTags.map((tag) => (
+					<button class="filter-btn" data-filter={tag}>{tag}</button>
+				))}
+			</div>
+
+			<ul class="post-list">
+				{
+					posts.map((post) => (
+						<li class="post-card" data-tags={post.data.tags?.join(',') || ''}>
+							<a href={`/blog/${post.id}/`}>
+								{post.data.heroImage && <Image width={720} height={360} src={post.data.heroImage} alt="" />}
+								<div class="post-content">
 									<h4 class="title">{post.data.title}</h4>
 									<p class="date">
 										<FormattedDate date={post.data.pubDate} />
 									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+									{post.data.tags && post.data.tags.length > 0 && (
+										<div class="tags-list">
+											{post.data.tags.map(tag => <span class="tag-pill">#{tag}</span>)}
+										</div>
+									)}
+								</div>
+							</a>
+						</li>
+					))
+				}
+			</ul>
 		</main>
 		<Footer />
+
+		<script>
+			function setupFilter() {
+				const buttons = document.querySelectorAll('.filter-btn');
+				const cards = document.querySelectorAll('.post-card');
+
+				buttons.forEach(btn => {
+					btn.addEventListener('click', () => {
+						// 1. 切换按钮高亮状态
+						buttons.forEach(b => b.classList.remove('active'));
+						btn.classList.add('active');
+
+						// 2. 获取当前点击的标签
+						const filterValue = btn.getAttribute('data-filter');
+
+						// 3. 遍历卡片进行隐藏/显示
+						cards.forEach(card => {
+							const cardTags = card.getAttribute('data-tags');
+							
+							if (filterValue === 'all') {
+								card.classList.remove('hidden');
+							} else {
+								// 如果卡片的标签里包含当前选中的标签，则显示
+								if (cardTags && cardTags.includes(filterValue)) {
+									card.classList.remove('hidden');
+								} else {
+									card.classList.add('hidden');
+								}
+							}
+						});
+					});
+				});
+			}
+
+			// 兼容 Astro 的页面加载机制
+			document.addEventListener('DOMContentLoaded', setupFilter);
+			document.addEventListener('astro:page-load', setupFilter);
+		</script>
 	</body>
 </html>
-

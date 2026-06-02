@@ -3,7 +3,9 @@ const today = new Date();
 ---
 
 <footer>
+<span class="copyright-text">
 	&copy; {today.getFullYear()} Romuda. All rights reserved.
+	</span>
 	<div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
 			<span class="sr-only">Follow Romuda on Mastodon</span>
@@ -70,4 +72,12 @@ const today = new Date();
 		transform: scale(1.2); /* 放大 1.2 倍 */
 		filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.8)); /* 加上显眼的霓虹光晕 */
 	}
+
+	/* 新增的荧光文字样式2026romuda */
+    .copyright-text {
+        color: #00ffff; /* 纯粹的荧光青/蓝绿色 */
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.7); /* 关键：加上发光阴影，才会有真正的“荧光”质感 */
+        font-weight: 500;
+        letter-spacing: 0.5px; /* 稍微拉开一点字距，更好看 */
+    }
 </style>

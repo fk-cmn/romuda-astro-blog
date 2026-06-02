@@ -57,13 +57,24 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	nav a {
 		padding: 1em 0.5em;
-		color: var(--black);
+		/* 核心修改：荧光蓝绿色 + 发光阴影 */
+		color: #00ffff !important;
+		text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		transition: all 0.3s ease; /* 添加平滑过渡动画 */
+	}
+	/* 鼠标悬停时的特效：变亮并发更强的光 */
+	nav a:hover {
+		color: #ffffff !important;
+		text-shadow: 0 0 12px rgba(0, 255, 255, 1);
 	}
 	nav a.active {
 		text-decoration: none;
-		border-bottom-color: var(--accent);
+		/* 底部激活的提示线也改为荧光色 */
+		border-bottom-color: #00ffff;
 	}
 	.social-links,
 	.social-links a {
