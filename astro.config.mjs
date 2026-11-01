@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeCollapsibleCode from './scripts/rehype-collapsible-code.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,14 +14,14 @@ export default defineConfig({
     integrations: [
         mdx({
             remarkPlugins: [remarkMath],
-            rehypePlugins: [rehypeKatex],
+            rehypePlugins: [rehypeKatex, rehypeCollapsibleCode],
         }), 
         sitemap()
     ],
     // 3. 核心配置：接入 Markdown 的 LaTeX 渲染插件
     markdown: {
         remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
+        rehypePlugins: [rehypeKatex, rehypeCollapsibleCode],
     },
     
     fonts: [

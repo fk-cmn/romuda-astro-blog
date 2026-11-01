@@ -74,6 +74,41 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				font-size: 0.95em !important;
 			}
 
+			/* 所有文章统一使用原生代码折叠栏。 */
+			.prose details.code-disclosure {
+				margin: 1.5em 0;
+				border: 1px solid #cbdff5;
+				border-radius: 10px;
+				overflow: hidden;
+				min-width: 0;
+			}
+			.prose details.code-disclosure > summary {
+				padding: 0.65em 1em;
+				background: #e2edfa;
+				color: #1e3a5f;
+				font-family: monospace;
+				font-size: 0.85em;
+				font-weight: 600;
+				cursor: pointer;
+				list-style: disclosure-closed inside;
+			}
+			.prose details.code-disclosure[open] > summary {
+				list-style-type: disclosure-open;
+				border-bottom: 1px solid #cbdff5;
+			}
+			.prose details.code-disclosure > summary:hover {
+				background: #d6e6f8;
+			}
+			.prose details.code-disclosure > summary:focus-visible {
+				outline: 2px solid #1e3a8a;
+				outline-offset: -3px;
+			}
+			main .prose details.code-disclosure > pre {
+				margin: 0;
+				border: 0;
+				border-radius: 0;
+			}
+
 			/* 纯文本图示和日志：浅蓝底、黑色文字 */
 			main.blog-white-theme .prose pre[data-language="text"],
 			main.blog-white-theme .prose pre[data-language="plaintext"] {
