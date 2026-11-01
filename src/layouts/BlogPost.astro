@@ -48,7 +48,7 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 			main.blog-white-theme p, main.blog-white-theme li { color: #242930 !important; }
 			main.blog-white-theme :not(pre) > code {
 				background: rgba(0, 0, 0, 0.06) !important;
-				color: #eb5757 !important;
+				color: #1e3a8a !important;
 				font-size: 1.05em !important; 
 				padding: 0.2rem 0.5rem !important;
 				margin: 0 2px !important;
@@ -56,6 +56,7 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				font-family: monospace;
 			}
 			main.blog-white-theme blockquote {
+				font-size: 0.95em !important;
 				background: rgba(0, 0, 0, 0.03) !important;
 				border-left: 4px solid #2337ff !important;
 				padding: 0.5em 1em !important; 
@@ -65,8 +66,41 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 			main.blog-white-theme blockquote p {
 				color: #556375 !important;
 				font-style: italic;
-				font-size: 0.95em !important; 
+				font-size: 1em !important;
 				margin: 0 !important;
+			}
+
+			main.blog-white-theme blockquote :not(pre) > code {
+				font-size: 0.95em !important;
+			}
+
+			/* 纯文本图示和日志：浅蓝底、黑色文字 */
+			main.blog-white-theme .prose pre[data-language="text"],
+			main.blog-white-theme .prose pre[data-language="plaintext"] {
+				background: #edf5ff !important;
+				color: #111111 !important;
+				border: 1px solid #cbdff5;
+				border-radius: 10px;
+			}
+			main.blog-white-theme .prose pre[data-language="text"] *,
+			main.blog-white-theme .prose pre[data-language="plaintext"] * {
+				color: #111111 !important;
+			}
+
+			/* 博客表格：完整显示外边框和单元格分界线 */
+			main.blog-white-theme .prose table {
+				border-collapse: collapse;
+				border: 1px solid #aab2bf;
+				margin: 1.5em 0;
+			}
+			main.blog-white-theme .prose th,
+			main.blog-white-theme .prose td {
+				border: 1px solid #aab2bf;
+				padding: 0.65em 0.8em;
+				vertical-align: top;
+			}
+			main.blog-white-theme .prose th {
+				background: rgba(35, 55, 255, 0.06);
 			}
 
 			/* About 页面专属：暗黑透光毛玻璃 */

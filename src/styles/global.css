@@ -24,25 +24,26 @@ body {
     color: #f1f5f9;
 }
 .header-glass {
-  /* 悬浮在最顶层 */
   position: sticky;
-  top: 0;
+  top: 12px;
   z-index: 100;
-  
-  /* 毛玻璃效果 */
-  background: rgba(20, 20, 20, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  
-  /* 底部边框微光，增加高级感 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  
-  /* 内边距与布局 */
-  padding: 1rem 2rem;
-  margin-bottom: 2rem;
-  
-  /* 确保过渡平滑 */
-  transition: all 0.3s ease;
+  background: rgba(20, 20, 20, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 0 1.25rem;
+  margin: 12px 16px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 720px) {
+  .header-glass {
+    top: 8px;
+    margin: 8px 8px 24px;
+    padding: 0 12px;
+    border-radius: 16px;
+  }
 }
 
 /* =================================================== */
