@@ -13,9 +13,16 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 	</head>
 	<body class="home-page">
 		<Header />
-		<div class="background-view" aria-hidden="true"></div>
+		<div class="background-view">
+			<a class="scroll-hint" href="#home-content" aria-label="向下滚动，查看首页内容">
+				<span>向下探索</span>
+				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</a>
+		</div>
 		
-		<main>
+		<main id="home-content">
 			<div class="glass-card">
 				<h1>Welcome to Romuda's night.</h1>
 				<p class="desc-text">这是我的个人博客，用于记录一些杂乱无章的随笔以及CS被拷打的历程。</p>
@@ -43,11 +50,39 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				right: 0;
 			}
 			.background-view {
+				position: relative;
 				height: 100vh;
 				height: 100svh;
 			}
 			main {
+				scroll-margin-top: 110px;
 				margin: 2rem auto;
+			}
+			.scroll-hint {
+				position: absolute;
+				bottom: 24px;
+				left: 50%;
+				transform: translateX(-50%);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+				padding: 8px 16px;
+				color: #ffffff;
+				text-decoration: none;
+				font-size: 0.8rem;
+				letter-spacing: 2px;
+				text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+				border-radius: 12px;
+			}
+			.scroll-hint:hover,
+			.scroll-hint:focus-visible {
+				color: #00ffff;
+				background: rgba(0, 0, 0, 0.2);
+			}
+			.scroll-hint:focus-visible {
+				outline: 2px solid #00ffff;
+				outline-offset: 4px;
 			}
 			.source-code-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 3.5rem; margin-bottom: 2rem; gap: 0.8rem; width: 100%; }
 			.credit-text { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); letter-spacing: 1px; font-family: monospace; }
