@@ -1,3 +1,37 @@
+# 博客维护
+
+在本项目目录运行命令。Agnes 聊天已暂时停用，备份位于 `disabled-features/agnes/`，Live2D 看板娘保留。
+
+## 新增文章
+
+在 `src/content/blog/` 下新建文章目录，例如 `my-new-post/index.md`，将配图放在同一目录。文章至少包含以下信息：
+
+```markdown
+---
+title: "文章标题"
+description: "文章简介"
+pubDate: 2026-11-01
+tags: ["随笔"]
+---
+
+文章正文。
+```
+
+`tags` 和 `heroImage` 可选。封面可写为 `heroImage: './cover.jpg'`。
+
+运行 `npm run dev` 本地预览，发布前运行 `npm run build`。构建产物位于 `dist/`。
+
+## 撤下文章
+
+将文章目录移到 `src/content/blog/` 以外（例如项目根目录的 `unpublished/`），或者删除相应文章，再运行 `npm run build`。文章将从列表、文章路由、RSS 和站点地图中移除。
+
+目前没有草稿过滤功能，添加 `draft: true` 不会隐藏文章，未来日期也不会阻止发布。文章路径影响访问地址，已发布文章不要随意改名。
+
+## 更新线上网站
+
+本地构建成功后，按原部署平台的方式更新：如果平台已连接 GitHub，则提交、推送到其监听的分支，并确认平台部署成功；如果手动部署，则上传完整的 `dist/`，确保部署会清除旧文章页面。仅修改本地文件不会更新线上网站。
+
+---
 # Astro Starter Kit: Blog
 
 ```sh

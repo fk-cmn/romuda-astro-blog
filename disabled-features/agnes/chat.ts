@@ -10,10 +10,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 2. 从环境变量读取密钥
     const apiKey = import.meta.env.AGNES_API_KEY;
-    console.log("🔑 当前读取到的 API 密钥是:", apiKey);
     // 3. 构建发送给 Agnes API 的数据包
     const payload = {
-      model: "agnes-2.0-flash", 
+      model: "agnes-2.0-flash",
       messages: [
         {
           role: "system",
@@ -37,9 +36,7 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     const data = await response.json();
-    
-    // 👇 调试代码安插在这里，就在 data 解析完之后！
-    console.log("👀 Agnes API 原始返回数据:", JSON.stringify(data, null, 2));
+
 
     if (data.error) {
         throw new Error(data.error.message || "API 内部错误");
@@ -56,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-    
+
   } catch (error: any) {
     console.error("后端接口报错:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });

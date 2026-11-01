@@ -1,0 +1,144 @@
+		<div
+			onclick="document.getElementById('chat-container-v4').style.display='flex'; document.getElementById('chat-input-v4').focus();"
+			style="position: fixed; bottom: 150px; left: 200px; z-index: 999999;
+				padding: 8px 14px; background-color: rgba(255, 179, 198,0.5);
+				border: 2px solid #fff; color: white !important; cursor: pointer;
+				font-size: 15px !important; font-weight: bold !important; border-radius: 20px 20px 20px 0;
+				box-shadow: 0 4px 15px rgba(255, 179, 198, 0.6); transition: 0.3s;">
+			💬 找我哦
+		</div>
+
+		<div id="chat-container-v4" style="display: none; position: fixed; bottom: 20px; left: 260px; width: 350px; height: 450px; background-color: #ffffff !important; border: 2px solid #ffb3c6 !important; border-radius: 16px; box-shadow: 0 10px 40px rgba(255, 179, 198, 0.5); z-index: 999999; flex-direction: column; overflow: hidden; resize: both;">
+
+			<div id="chat-header-v4" style="flex-shrink: 0 !important; height: 48px !important; min-height: 48px !important; cursor: grab; display: flex; justify-content: space-between; align-items: center; background-color: #ffb3c6 !important; padding: 0 16px; box-sizing: border-box; width: 100%;">
+			  <span style="font-weight: bold !important; color: #ffffff !important; font-size: 16px !important; opacity: 1 !important; visibility: visible !important;">💬 和嘉然聊天 (点这拖动)</span>
+			  <span id="close-chat-v4" style="cursor: pointer; font-size: 26px !important; color: #ffffff !important; font-weight: bold !important;">&times;</span>
+			</div>
+
+			<div id="chat-history-v4" style="flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto; padding: 15px; background-color: #ffffff !important; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box; width: 100%;">
+			  <div style="color: #000000 !important; font-size: 14px !important; opacity: 1 !important; visibility: visible !important; display: block !important;">
+				<span style="color: #e84393 !important; font-weight: bold !important;">【嘉然】:</span>
+				快来和我聊天吧！嘻嘻小可爱有什么可以帮到你呀？
+			  </div>
+			</div>
+
+			<div style="flex-shrink: 0 !important; display: flex; gap: 8px; padding: 12px; border-top: 1px solid #ffe6eb !important; background-color: #ffffff !important; box-sizing: border-box; width: 100%;">
+			  <input type="text" id="chat-input-v4" placeholder="输入你想说的话..." style="flex: 1; padding: 8px 12px; border: 1px solid #ffb3c6 !important; border-radius: 8px; color: #000000 !important; background-color: #ffffff !important; outline: none;" />
+			  <button id="send-btn-v4" style="flex-shrink: 0; padding: 8px 16px; background-color: #ffb3c6 !important; color: #ffffff !important; font-weight: bold !important; border: none; border-radius: 8px; cursor: pointer;">发送</button>
+			</div>
+		</div>
+
+		<script is:inline>
+			(function() {
+			  const container = document.getElementById('chat-container-v4');
+			  const header = document.getElementById('chat-header-v4');
+			  const closeBtn = document.getElementById('close-chat-v4');
+			  const chatHistory = document.getElementById('chat-history-v4');
+			  const chatInput = document.getElementById('chat-input-v4');
+			  const sendBtn = document.getElementById('send-btn-v4');
+
+			  if (!container || !header) return;
+
+			  // === 绝对精确拖拽逻辑 ===
+			  let isDragging = false;
+			  let startX, startY, initialLeft, initialTop;
+
+			  header.onmousedown = function(e) {
+				e.preventDefault();
+				isDragging = true;
+				header.style.cursor = 'grabbing';
+
+				const rect = container.getBoundingClientRect();
+				container.style.bottom = 'auto';
+				container.style.right = 'auto';
+
+				initialLeft = rect.left;
+				initialTop = rect.top;
+				startX = e.clientX;
+				startY = e.clientY;
+
+				container.style.left = initialLeft + 'px';
+				container.style.top = initialTop + 'px';
+
+				document.body.style.userSelect = 'none';
+
+				document.onmousemove = elementDrag;
+				document.onmouseup = closeDragElement;
+			  };
+
+			  function elementDrag(e) {
+				if (!isDragging) return;
+				e.preventDefault();
+				const dx = e.clientX - startX;
+				const dy = e.clientY - startY;
+				container.style.left = (initialLeft + dx) + 'px';
+				container.style.top = (initialTop + dy) + 'px';
+			  }
+
+			  function closeDragElement() {
+				isDragging = false;
+				header.style.cursor = 'grab';
+				document.body.style.userSelect = '';
+				document.onmousemove = null;
+				document.onmouseup = null;
+			  }
+
+			  // === 关闭 ===
+			  if (closeBtn) {
+				closeBtn.addEventListener('click', (e) => {
+				  e.stopPropagation();
+				  container.style.display = 'none';
+				});
+			  }
+
+			  // === 通信 ===
+			  function appendMessage(sender, text, color) {
+				const msgDiv = document.createElement('div');
+				msgDiv.innerHTML = `<span style="color: ${color} !important; font-weight: bold !important;">[${sender}]</span>: <span style="color: #000000 !important;">${text}</span>`;
+				if (chatHistory) {
+				  chatHistory.appendChild(msgDiv);
+				  chatHistory.scrollTop = chatHistory.scrollHeight;
+				}
+			  }
+
+			  async function sendMessage() {
+				if (!chatInput || !chatHistory) return;
+				const text = chatInput.value.trim();
+				if (!text) return;
+
+				appendMessage('我', text, '#0984e3');
+				chatInput.value = '';
+
+				const loadingId = 'loading-' + Date.now();
+				const loadingDiv = document.createElement('div');
+				loadingDiv.id = loadingId;
+				loadingDiv.innerText = '嘉然正在思考哦...';
+				loadingDiv.style.color = '#888888 !important';
+				loadingDiv.style.fontSize = '12px !important';
+				chatHistory.appendChild(loadingDiv);
+
+				try {
+				  const res = await fetch('/api/chat', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ message: text })
+				  });
+				  const data = await res.json();
+				  document.getElementById(loadingId)?.remove();
+				  if (data.reply) {
+					appendMessage('嘉然', data.reply, '#e84393');
+				  } else {
+					appendMessage('系统', '脑电波连接失败...', '#d63031');
+				  }
+				} catch (error) {
+				   document.getElementById(loadingId)?.remove();
+				   appendMessage('系统', '网络开小差了...', '#d63031');
+				}
+			  }
+
+			  sendBtn?.addEventListener('click', sendMessage);
+			  chatInput?.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') sendMessage();
+			  });
+			})();
+		</script>
