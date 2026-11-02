@@ -64,13 +64,32 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 				transform: translateY(-2px);
 			}
 
+			.post-search {
+				flex: 0 1 260px;
+				min-width: 180px;
+				margin-left: auto;
+				padding: 0.65rem 0.9rem;
+				border: 1px solid rgba(255, 255, 255, 0.28);
+				border-radius: 8px;
+				background: rgba(255, 255, 255, 0.1);
+				color: #ffffff;
+				font: inherit;
+			}
+			.post-search::placeholder { color: #cbd5e1; }
+			.post-search:focus-visible {
+				border-color: #00ffff;
+				outline: 2px solid rgba(0, 255, 255, 0.35);
+				outline-offset: 2px;
+			}
+
 			/* =================================================== */
 			/* 2. 博客文章卡片列表 */
 			/* =================================================== */
 			ul {
 				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				gap: 2rem;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 420px));
+				justify-content: center;
+				gap: 1.5rem;
 				list-style-type: none;
 				margin: 0;
 				padding: 0;
@@ -81,7 +100,7 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 				background: rgba(255, 255, 255, 0.05);
 				backdrop-filter: blur(10px);
 				border: 1px solid rgba(255, 255, 255, 0.1);
-				border-radius: 16px;
+				border-radius: 12px;
 				overflow: hidden;
 				transition: all 0.3s ease;
 				/* 为了 JS 过滤时的丝滑淡入淡出 */
@@ -100,21 +119,21 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 
 			.post-card img {
 				width: 100%;
-				height: 250px;
+				height: 190px;
 				object-fit: cover;
 				margin-bottom: 0;
 				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 			}
 
 			.post-content {
-				padding: 1.5rem;
+				padding: 1.2rem;
 			}
 
 			.post-content .title {
 				margin: 0;
 				color: #ffffff;
 				line-height: 1.4;
-				font-size: 1.5rem;
+				font-size: 1.25rem;
 			}
 
 			.post-content .date {
@@ -145,7 +164,8 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 			a { text-decoration: none; }
 			
 			@media (max-width: 768px) {
-				ul { grid-template-columns: 1fr; }
+				ul { grid-template-columns: minmax(0, 420px); }
+				.post-search { flex-basis: 100%; min-width: 0; margin-left: 0; }
 			}
 		</style>
 	</head>
@@ -157,12 +177,17 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 				{allTags.map((tag) => (
 					<button class="filter-btn" data-filter={tag}>{tag}</button>
 				))}
+				<input class="post-search" type="search" placeholder="搜索文章标题、简介或标签" aria-label="搜索文章标题、简介或标签" />
 			</div>
 
 			<ul class="post-list">
 				{
 					posts.map((post) => (
-						<li class="post-card" data-tags={post.data.tags?.join(',') || ''}>
+						<li
+							class="post-card"
+							data-tags={post.data.tags?.join(' ') || ''}
+							data-search={`${post.data.title} ${post.data.description} ${post.data.tags?.join(' ') || ''}`}
+						>
 							<a href={`/blog/${post.id}/`}>
 								{post.data.heroImage && <Image width={720} height={360} src={post.data.heroImage} alt="" />}
 								<div class="post-content">
@@ -186,35 +211,35 @@ const allTags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
 
 		<script>
 			function setupFilter() {
+				const filterContainer = document.querySelector('.filter-container');
+				if (!filterContainer || filterContainer.dataset.initialized) return;
+				filterContainer.dataset.initialized = 'true';
+
 				const buttons = document.querySelectorAll('.filter-btn');
 				const cards = document.querySelectorAll('.post-card');
+				const search = document.querySelector('.post-search');
+				let activeTag = 'all';
+
+				const applyFilters = () => {
+					const query = search.value.trim().toLocaleLowerCase();
+					cards.forEach(card => {
+						const matchesTag = activeTag === 'all'
+							|| card.dataset.tags.split(' ').includes(activeTag);
+						const matchesSearch = (card.dataset.search || '').toLocaleLowerCase().includes(query);
+						card.classList.toggle('hidden', !(matchesTag && matchesSearch));
+					});
+				};
 
 				buttons.forEach(btn => {
 					btn.addEventListener('click', () => {
-						// 1. 切换按钮高亮状态
 						buttons.forEach(b => b.classList.remove('active'));
 						btn.classList.add('active');
-
-						// 2. 获取当前点击的标签
-						const filterValue = btn.getAttribute('data-filter');
-
-						// 3. 遍历卡片进行隐藏/显示
-						cards.forEach(card => {
-							const cardTags = card.getAttribute('data-tags');
-							
-							if (filterValue === 'all') {
-								card.classList.remove('hidden');
-							} else {
-								// 如果卡片的标签里包含当前选中的标签，则显示
-								if (cardTags && cardTags.includes(filterValue)) {
-									card.classList.remove('hidden');
-								} else {
-									card.classList.add('hidden');
-								}
-							}
-						});
+						activeTag = btn.dataset.filter;
+						applyFilters();
 					});
 				});
+
+				search.addEventListener('input', applyFilters);
 			}
 
 			// 兼容 Astro 的页面加载机制

@@ -3,6 +3,11 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getCollection } from 'astro:content';
+
+const latestPost = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+)[0];
 ---
 
 <!doctype html>
@@ -92,7 +97,11 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 		<Footer />
 		
-		<div class="pio-container left">
+		<div
+			id="pio-container"
+			class="pio-container left"
+			data-latest-title={latestPost?.data.title ?? ''}
+		>
 			<div class="pio-action" style="display: none !important;"></div>
 			<canvas id="pio"></canvas>
 		</div>

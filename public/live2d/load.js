@@ -40,11 +40,17 @@ const initConfig = {
     "/live2d/Diana/Diana.model3.json",
     "/live2d/Ava/Ava.model3.json",
   ],
-  tips: true,
+  tips: false,
   onModelLoad: onModelLoad
 }
 
 function 加载圣·嘉然() {
+  const container = document.getElementById("pio-container")
+  const latestTitle = container?.dataset.latestTitle
+  if (latestTitle) {
+    initConfig.content.welcome = [`最新更新了《${latestTitle}》，有空去看看呀~`]
+  }
+
   pio_reference = new Paul_Pio(initConfig)
 
   pio_alignment = "left"
@@ -143,6 +149,15 @@ function onModelLoad(model) {
       },
     ]
 
+    const dialog = container.querySelector(".pio-dialog")
+    const latestTitle = container.dataset.latestTitle
+    if (dialog && latestTitle) {
+      window.setInterval(() => {
+        if (!dialog.classList.contains("active")) {
+          pio_reference.modules.render(`最新更新了《${latestTitle}》，有空去看看呀~`)
+        }
+      }, 20000)
+    }
   } else if (modelNmae === "Ava") {
     container.dataset.model = "Ava"
     initConfig.content.skin[1] = ["我是<s>拉胯</s>Gamer担当 向晚 AvA~"]

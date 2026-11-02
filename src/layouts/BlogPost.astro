@@ -82,10 +82,21 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				overflow: hidden;
 				min-width: 0;
 			}
+			.prose details.code-disclosure:not([open]) {
+				display: inline-block;
+				width: fit-content;
+				max-width: 100%;
+			}
+			.prose details.code-disclosure[open] {
+				display: block;
+				width: 100%;
+			}
 			.prose details.code-disclosure > summary {
 				padding: 0.65em 1em;
 				background: #e2edfa;
 				color: #1e3a5f;
+				border: 0;
+				border-radius: 0;
 				font-family: monospace;
 				font-size: 0.85em;
 				font-weight: 600;
@@ -96,6 +107,9 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				list-style-type: disclosure-open;
 				border-bottom: 1px solid #cbdff5;
 			}
+			.prose details.code-disclosure:not([open]) > summary {
+				white-space: nowrap;
+			}
 			.prose details.code-disclosure > summary:hover {
 				background: #d6e6f8;
 			}
@@ -104,8 +118,14 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				outline-offset: -3px;
 			}
 			main .prose details.code-disclosure > pre {
+				box-sizing: border-box;
+				max-width: 100%;
+				overflow-x: auto;
 				margin: 0;
 				border: 0;
+				border-radius: 0;
+			}
+			.prose details.code-disclosure[open] > summary {
 				border-radius: 0;
 			}
 
@@ -114,8 +134,8 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 			main.blog-white-theme .prose pre[data-language="plaintext"] {
 				background: #edf5ff !important;
 				color: #111111 !important;
-				border: 1px solid #cbdff5;
-				border-radius: 10px;
+				border: 0;
+				border-radius: 0;
 			}
 			main.blog-white-theme .prose pre[data-language="text"] *,
 			main.blog-white-theme .prose pre[data-language="plaintext"] * {
@@ -140,10 +160,10 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 
 			/* About 页面专属：暗黑透光毛玻璃 */
 			main.about-dark-theme {
-				background: rgba(0, 0, 0, 0.35) !important;
-				backdrop-filter: blur(12px) saturate(150%);
-				-webkit-backdrop-filter: blur(12px) saturate(150%);
-				border: 1px solid rgba(255, 255, 255, 0.1); 
+				background: rgba(20, 20, 20, 0.7) !important;
+				backdrop-filter: blur(16px) saturate(180%);
+				-webkit-backdrop-filter: blur(16px) saturate(180%);
+				border: 1px solid rgba(255, 255, 255, 0.15);
 				box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 				border-radius: 16px;
 				padding: 3em 2em;
@@ -193,19 +213,21 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 			.toc-drawer {
 				position: fixed !important;
 				top: 0 !important;
-				right: -360px !important; /* 默认隐藏在屏幕外 */
-				width: 320px !important;
+				right: 0 !important;
+				transform: translateX(100%); /* 完全移出视口，避免露边 */
+				width: min(320px, calc(100vw - 32px)) !important;
+				box-sizing: border-box !important;
 				height: 100vh !important;
 				background: rgba(255, 255, 255, 0.95) !important;
 				backdrop-filter: blur(20px) !important;
 				-webkit-backdrop-filter: blur(20px) !important;
 				box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15) !important;
 				z-index: 10000 !important;
-				transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+				transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 				padding: 2.5rem 1.5rem !important;
 				overflow-y: auto !important;
 			}
-			.toc-drawer.open { right: 0 !important; }
+			.toc-drawer.open { transform: translateX(0); }
 			
 			/* 抽屉头部 */
 			.toc-drawer-header {
@@ -252,7 +274,7 @@ const isAboutPage = title === 'About' || title === 'About Me' || Astro.url.pathn
 				main.blog-white-theme, main.about-dark-theme {
 					padding: 2em 1.2em !important;
 				}
-				.toc-drawer { width: 280px !important; right: -300px !important; }
+				.toc-drawer { width: min(280px, calc(100vw - 16px)) !important; }
 				.toc-toggle-btn { bottom: 20px !important; right: 20px !important; padding: 8px 15px !important; }
 			}
 		</style>
