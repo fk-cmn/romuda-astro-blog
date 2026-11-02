@@ -15,10 +15,12 @@ const latestPost = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<link rel="stylesheet" href="/live2d/pio.css" />
+		<link rel="preload" href="/fonts/great-vibes-regular.ttf" as="font" type="font/ttf" crossorigin />
 	</head>
 	<body class="home-page">
 		<Header />
 		<div class="background-view">
+			<h1 class="hero-title">Welcome to Romuda's World</h1>
 			<a class="scroll-hint" href="#home-content" aria-label="向下滚动，查看首页内容">
 				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 					<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -28,7 +30,6 @@ const latestPost = (await getCollection('blog')).sort(
 		
 		<main id="home-content">
 			<div class="glass-card">
-				<h1>Welcome to Romuda's night.</h1>
 				<p class="desc-text">这是我的个人博客，用于记录一些杂乱无章的随笔以及CS被拷打的历程。</p>
 				<p class="desc-text"><del>（其实都是胡言乱语罢了）</del></p>
 			</div>
@@ -45,6 +46,13 @@ const latestPost = (await getCollection('blog')).sort(
 		</main>
 
 		<style>
+			@font-face {
+				font-family: 'Great Vibes';
+				src: url('/fonts/great-vibes-regular.ttf') format('truetype');
+				font-style: normal;
+				font-weight: 400;
+				font-display: swap;
+			}
 			:global(body.home-page) {
 				margin: 0;
 			}
@@ -57,6 +65,25 @@ const latestPost = (await getCollection('blog')).sort(
 				position: relative;
 				height: 100vh;
 				height: 100svh;
+			}
+			.hero-title {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				box-sizing: border-box;
+				width: 100%;
+				max-width: 1440px;
+				margin: 0;
+				padding: 0 1.5rem;
+				font-family: 'Great Vibes', 'Segoe Script', cursive;
+				font-size: clamp(2.8rem, 7vw, 6.5rem);
+				font-weight: 400;
+				line-height: 1.35;
+				text-align: center;
+				text-wrap: balance;
+				color: #fff;
+				text-shadow: 0 3px 16px rgba(0, 25, 20, 0.75), 0 1px 4px rgba(0, 0, 0, 0.5);
 			}
 			main {
 				scroll-margin-top: 110px;
@@ -82,7 +109,7 @@ const latestPost = (await getCollection('blog')).sort(
 			.scroll-hint:hover,
 			.scroll-hint:focus-visible {
 				color: #00ffff;
-				background: rgba(0, 0, 0, 0.2);
+				background: rgba(8, 42, 34, 0.28);
 			}
 			.scroll-hint:focus-visible {
 				outline: 2px solid #00ffff;

@@ -118,18 +118,22 @@
 }
 
 .pio-container .pio-dialog {
-    top: -2em;
+    top: -4.5em;
     opacity: 0;
     z-index: -1;
     font-size: .8em;
     min-width: 12em;
-    background: #fff;
+    color: #fff;
+    background: rgba(8, 42, 34, 0.78);
     padding: .75em 1em;
     border-radius: 1em;
     visibility: hidden;
     position: absolute;
     word-break: break-all;
-    border: 1px solid #eee;
+    border: 1px solid rgba(155, 220, 190, 0.45);
+    box-shadow: 0 8px 24px rgba(0, 20, 14, 0.24);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: opacity .3s, visibility .3s;
 }
 

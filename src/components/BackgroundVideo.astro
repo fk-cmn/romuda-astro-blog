@@ -1,0 +1,36 @@
+<video
+  class="site-background-video"
+  data-background-video
+  autoplay
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  poster="/blog-cover.png"
+  aria-hidden="true"
+  tabindex="-1"
+></video>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>('[data-background-video]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (video) {
+    video.muted = true;
+    video.addEventListener('playing', () => video.classList.add('is-playing'));
+    video.addEventListener('error', () => video.classList.remove('is-playing'));
+
+    const updatePlayback = () => {
+      if (reducedMotion.matches) {
+        video.pause();
+        video.classList.remove('is-playing');
+        return;
+      }
+      if (!video.getAttribute('src')) video.src = '/blog-background.mp4';
+      void video.play().catch(() => video.classList.remove('is-playing'));
+    };
+
+    reducedMotion.addEventListener('change', updatePlayback);
+    updatePlayback();
+  }
+</script>

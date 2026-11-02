@@ -25,7 +25,7 @@ const initConfig = {
   hidden: true,
   content: {
     link: 引流[Math.floor(Math.random() * 引流.length)],
-    welcome: ["Hi!"],
+    welcome: ["こんにちは！"],
     touch: "",
     skin: ["诶，想看看其他团员吗？", "替换后入场文本"],
     custom: [
@@ -48,7 +48,7 @@ function 加载圣·嘉然() {
   const container = document.getElementById("pio-container")
   const latestTitle = container?.dataset.latestTitle
   if (latestTitle) {
-    initConfig.content.welcome = [`最新更新了《${latestTitle}》，有空去看看呀~`]
+    initConfig.content.welcome = [`新しい記事「${latestTitle}」が公開されたよ。よかったら読んでみてね〜！`]
   }
 
   pio_reference = new Paul_Pio(initConfig)
@@ -107,7 +107,7 @@ function onModelLoad(model) {
 
   if (modelNmae === "Diana") {
     container.dataset.model = "Diana"
-    initConfig.content.skin[1] = ["我是吃货担当 嘉然 Diana~"]
+    initConfig.content.skin[1] = ["食いしん坊担当の嘉然、Dianaです〜！"]
     playAction({ motion: "Tap抱阿草-左手" })
 
     touchList = [
@@ -154,7 +154,7 @@ function onModelLoad(model) {
     if (dialog && latestTitle) {
       window.setInterval(() => {
         if (!dialog.classList.contains("active")) {
-          pio_reference.modules.render(`最新更新了《${latestTitle}》，有空去看看呀~`)
+          pio_reference.modules.render(`新しい記事「${latestTitle}」が公開されたよ。よかったら読んでみてね〜！`)
         }
       }, 20000)
     }
