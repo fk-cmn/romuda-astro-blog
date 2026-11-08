@@ -4,6 +4,7 @@ description: "check5-7"
 pubDate: 2026-11-01
 tags: ['计网', 'CS']
 heroImage: "./title.png"
+updatedDate: 2026-11-08
 ---
 
 ## 写在前面
@@ -115,7 +116,7 @@ EthernetFrame
 
 `序列化：按照协议规定的字段顺序和字节序生成字节，“协议”取决于正在序列化哪个对象。`
 
-1.`serialize()`：把对象编码成协议字节  
+1.`serialize()`：把对象编码成协议字节
 
 2.`parse()`：把协议字节解析成对象
 
@@ -133,7 +134,6 @@ EthernetFrame
 >
 > `recv_frame()` 解析收到的帧并处理 ARP
 >
-
 > `tick()` 管理地址映射和请求的有效期
 
 ### send_datagram()
@@ -153,7 +153,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
     frame.header.src =  ethernet_address_;
     frame.header.dst =  it->second.mac;
     frame.header.type = EthernetHeader::TYPE_IPv4;
-    frame.payload = serialize(dgram); 
+    frame.payload = serialize(dgram);
     transmit(frame);
     return;
   }
@@ -174,11 +174,11 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
     arp_frame.header.src =  ethernet_address_;
     arp_frame.header.dst =  ETHERNET_BROADCAST;
     arp_frame.header.type = EthernetHeader::TYPE_ARP;
-    arp_frame.payload = serialize(arp); 
+    arp_frame.payload = serialize(arp);
     transmit(arp_frame);
   // ARP 请求交给输出端口后，开始计时
   arp_request_age_ms_[next_ip] = 0;
-  
+
 }
 ```
 
@@ -199,7 +199,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
    尝试把帧的 payload 解析成 `InternetDatagram`，成功后放入 `datagrams_received_`，失败则丢弃。并且处理完 IPv4 分支后都返回，避免再按 ARP 处理同一帧。
 
 ```cpp
-//IPv4 
+//IPv4
   if (frame.header.type == EthernetHeader::TYPE_IPv4) {
   InternetDatagram dgram;
   if (parse(dgram, frame.payload)) {
@@ -213,7 +213,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 
   在解析消息后，检查它是否是本实现支持的 ARP 格式，然后接口更新 `arp_cache_`，记录“发送方 IP 对应这个 MAC”。接着查看是否有数据报正等待这个发送方的 MAC，有就就把每个数据报序列化为 IPv4 以太网帧来发送。最后，检查这是否是发给本接口 IP 的 ARP 请求，如果是的话就构造 ARP通过frame回复。
 
-```cpp
+```
 //ARP
   if(frame.header.type == EthernetHeader::TYPE_ARP){
     ARPMessage arp;
@@ -224,8 +224,8 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
       return;
     }
     const uint32_t sender_ip = arp.sender_ip_address;
-    arp_cache_[sender_ip] = ARPEntry{arp.sender_ethernet_address, 0}; 
-    
+    arp_cache_[sender_ip] = ARPEntry{arp.sender_ethernet_address, 0};
+
     const auto pend = pending_datagrams_.find(sender_ip);
     if(pend!=pending_datagrams_.end()){
      auto& queue = (pend->second);
@@ -263,16 +263,14 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
   }
 ```
 
-总体上就是：
-
-```text
-   目的 MAC 过滤
-       → 按 Ethernet type 分流
-      IPv4：解析 → 入队供上层读取
-      ARP：解析和校验 → 学习 IP/MAC
-            → 发送等待中的 IPv4 数据报
-            → 若请求的是本接口 IP，则回复 ARP
-```
+> 总体上就是：
+>
+>    目的 MAC 过滤
+>        → 按 Ethernet type 分流
+>       IPv4：解析 → 入队供上层读取
+>       ARP：解析和校验 → 学习 IP/MAC
+>             → 发送等待中的 IPv4 数据报
+>             → 若请求的是本接口 IP，则回复 ARP
 
 ### tick()：计时与过期清理
 
@@ -280,7 +278,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 
 1.未完成的 ARP 请求 arp_request_age_ms_等待达 5 秒后，删除请求记录及对应的待发数据报，因此后面`send_datagram()` 再遇到缓存未命中，就可以重新发起新的 ARP 请求。
 
-```cpp
+```c++
  for (auto it = arp_request_age_ms_.begin(); it != arp_request_age_ms_.end();) {
     if (it->second >= 5000 || ms_since_last_tick >= 5000 - it->second) {
       pending_datagrams_.erase(it->first);
@@ -294,7 +292,7 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
 
 2.已学到的 ARP 映射缓存时间达 30 秒后删除，未到期的条目则累加本次经过的毫秒数。
 
-```cpp
+```c++
 for (auto it = arp_cache_.begin(); it != arp_cache_.end();) {
     if(it->second.age_ms >= 30000 || ms_since_last_tick >= 30000 - it->second.age_ms){
       it = arp_cache_.erase(it);
@@ -307,7 +305,11 @@ for (auto it = arp_cache_.begin(); it != arp_cache_.end();) {
 
 ## checkpoint 6
 
-这个处理的是实现路由器怎么分发，分发给谁的问题，核心是检查 IP 数据报并作转发决策。
+Checkpoint 5 实现了网络接口收发功能，比如发送的时候，调用者需要先选择一个接口，并提供 IPv4 数据报和下一跳 IP。接口再查询 ARP 缓存，必要时发送 ARP 请求，获得下一跳 MAC 后封装以太网帧发送。
+
+但这取决于一个前提：**应该选择哪个接口，下一跳 IP 又是什么？**
+
+Checkpoint 6实现的路由器，解决的问题就是上面的决策。 路由器根据数据报的最终目的 IP 查询路由表，选择出口接口和下一跳，再调用 Checkpoint 5 的网络接口完成发送。
 
 ### 涉及到的名词
 
@@ -327,6 +329,154 @@ for (auto it = arp_cache_.begin(); it != arp_cache_.end();) {
 | 入口接口（incoming interface） | 收到当前数据报的网络接口                           | Router 从它的接收队列中取出数据报                  |
 | 出口接口（egress interface）   | 路由选出的发送接口                                 | 调用它的 `send_datagram()` 继续转发                |
 | 直连路由（direct route）       | 不指定 `next_hop` 的路由                           | 表示目的网络直接连接到出口接口，下一跳就是目的主机 |
+|                                |                                                    |                                                    |
+
+### IPv4 地址与网络前缀
+
+IPv4 地址用于网络层寻址，通常配置在网络接口上。据报首部中的**源 IP**表示发送方地址，**目的 IP**表示最终要到达的地址，路由器会根据目的 IP 选择转发方向。
+
+ 它总共有**32 个二进制位**，通常分成四组，每组 8 位，转换成十进制后用点连接，每组取值为 `0～255`：
+
+> 十进制：192.168.1.123
+> 二进制：11000000  10101000  00000001  01111011
+
+如果要用一条路由描述一个地址范围，我们需要指定前缀长度，比如，192.168.1.0/24，这里的**`/24` 表示前 24 位固定，后 8 位可以变化**，所以路由的匹配范围是192.168.1.0～192.168.1.255。另外，前缀长度按二进制位计算，不一定以点分组为边界。
+
+### 路由器要保存哪些信息？
+
+大致是两类信息：已经连接的网络接口，以及决定如何使用这些接口的转发规则，这样才方便后续进行匹配转发的时候去查表。
+
+这个保存提前创建好的接口对象在原框架的代码里已经有所包含，我们通过`interface(N)`取得已有接口：
+
+```cpp
+std::vector<std::shared_ptr<NetworkInterface>> interfaces_ {};
+```
+
+知道有这些接口后，我们就要思考如何实现它的导航功能了，也就是“发往某个目的地址的数据报应该走哪个接口”，这就要求需要额外保存**匹配条件和转发动作之间的规则**。
+
+所以我在这里创建了一个RouteEntry结构体，将一条转发规则分成匹配条件和转发动作。`route_prefix` 和 `prefix_length` 描述**适用的目的地址范围**；`next_hop` 和 `interface_num` 描述**匹配后从哪里发出、要交给谁**，所有的条目存于routes_。
+
+```cpp
+struct RouteEntry
+{
+  uint32_t route_prefix {};
+  uint8_t prefix_length {};
+  std::optional<Address> next_hop {};
+  size_t interface_num {};
+};
+
+std::vector<RouteEntry> routes_ {};
+```
+
+> // route_prefix：用于与数据报目的地址进行匹配的 IPv4 地址前缀，
+> // 最多使用其中的 32 位。
+>
+> // prefix_length：这条路由适用时，route_prefix 的多少个高位
+> //（最高有效位）必须与数据报目的地址的对应位相同？
+>
+> // next_hop：下一跳的 IP 地址。
+> // 如果目的网络直接连接在本路由器上，这个值为空；
+> // 此时应将数据报的最终目的地址用作下一跳地址。
+>
+> // interface_num：发送该数据报所使用的出口接口下标。
+
+当收到数据报后，路由器读取其 IPv4 首部中的目的地址，开始遍历路由表。匹配规则要求**前缀规定的高位相同**。如果多条规则都匹配，则选择前缀最长、目的范围最具体的规则，再交给对应接口完成下一跳发送。
+
+### 如何增添和执行上述的规则
+
+这里关注add_route()和route()这2个函数。
+
+前面我们提到的route_prefix来自于先前添加的路由规则，然后路由器用数据报的“目的 IPv4 地址”与它比较。这里，add_route()就是负责配置规则的部分，route()则用于处理拿到的数据报，读取其目的 IP，与前保存的规则逐条匹配。
+
+```cpp
+//提供目的地址前缀、前缀长度、下一跳和出口接口
+void Router::add_route( const uint32_t route_prefix,
+                        const uint8_t prefix_length,
+                        const optional<Address> next_hop,
+                        const size_t interface_num )
+{
+  cerr << "DEBUG: adding route " << Address::from_ipv4_numeric( route_prefix ).ip() << "/"
+       << static_cast<int>( prefix_length ) << " => " << ( next_hop.has_value() ? next_hop->ip() : "(direct)" )
+       << " on interface " << interface_num << "\n";
+
+  routes_.push_back(
+    RouteEntry { route_prefix, prefix_length, next_hop, interface_num });
+
+}
+```
+
+#### **Route(): 根据路由表处理收到的数据报**
+
+整个过程就是：**取出数据报、检查 TTL、查找最长前缀匹配、更新首部并转发。**
+
+1.Checkpoint 5 的接口收到 IPv4 帧后，会将解析成功的数据报放进 `datagrams_received_`，这时就由路由器遍历所有接口，逐个取出队列中的数据报。
+
+```cpp
+for (const auto& incoming : interfaces_) {
+  auto& queue = incoming->datagrams_received();
+
+  while (!queue.empty()) {
+    InternetDatagram dgram = std::move(queue.front());
+    queue.pop();
+
+    if (dgram.header.ttl <= 1) {
+       continue;
+     }
+    //...
+  }
+}
+```
+
+2.TTL 用于限制数据报的转发生命，防止它因路由环路而无限传播。在我的函数里，每转发一次就减一，收到TTL时若为 `0` 或 `1`，就直接丢弃。
+
+3.关于查找匹配且前缀最长的规则
+
+```cpp
+const RouteEntry* best = nullptr;
+
+for (const auto& route : routes_) {
+  const bool matches =
+    route.prefix_length == 0
+    || (dgram.header.dst >> (32 - route.prefix_length))
+         == (route.route_prefix >> (32 - route.prefix_length));
+
+  if (matches
+      && (best == nullptr
+          || route.prefix_length > best->prefix_length)) {
+    best = &route;
+  }
+}
+//对于新的数据报，重新初始化 best
+if (best == nullptr) {
+  continue;
+}
+```
+
+`best` 保存当前找到的最佳条目，若多条规则都匹配，就选择 `prefix_length` 最大的一条（更具体）。
+
+对每条路由，将目的 IP 和路由前缀都右移 `32 - prefix_length` 位，保留需要比较的高位。
+
+注意/0是要单独判断的，它表示匹配所有地址，避免执行右移 32 位的操作。
+
+4.确定可以转发后，将 TTL 减一，然后确定下一跳 IP。`value_or()` 表示：如果条目指定了下一跳，就使用它；如果为空，说明是直连路由，使用数据报的最终目的 IP 作为下一跳。随后，取得已有的出口接口调用发送函数，继续执行check5的操作。
+
+```c++
+--dgram.header.ttl;
+dgram.header.compute_checksum();
+const Address next_hop =
+  best->next_hop.value_or(
+    Address::from_ipv4_numeric(dgram.header.dst));
+interface(best->interface_num)->send_datagram(dgram, next_hop);
+```
+
+> IPv4 首部
+> ├── 源 IP、目的 IP
+> ├── TTL
+> ├── 其他字段
+> └── 首部校验和：根据首部内容计算
+>
+> IPv4 首部校验和用于检测首部差错。TTL 是首部的一部分，路由器将其减一后，必须同步更新校验和，否则下一跳可能判定首部校验失败。该校验和只覆盖 IPv4 首部，不包含 payload。
+
 ## checkpoint 7
 
 一个端到端的验证性check，和check4一样，不用写代码，主要是把前面已完成的 TCP、NetworkInterface 和 Router 组合起来，看看能不能正确传输文件。
