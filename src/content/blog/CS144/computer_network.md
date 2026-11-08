@@ -467,8 +467,10 @@ const Address next_hop =
   best->next_hop.value_or(
     Address::from_ipv4_numeric(dgram.header.dst));
 interface(best->interface_num)->send_datagram(dgram, next_hop);
-```
 
+
+```
+<img src="./3.png" alt="image-20260603192432921" style="zoom:67%;" />
 > IPv4 首部<br>
 > ├── 源 IP、目的 IP<br>
 > ├── TTL<br>
@@ -539,3 +541,12 @@ sha256sum /tmp/cs144-send.bin /tmp/cs144-received.bin
 f18481a3c18e6e68bc8e945e6119f2a0d64053cfc76afb05f1fd745ed99a648e  /tmp/cs144-send.bin
 f18481a3c18e6e68bc8e945e6119f2a0d64053cfc76afb05f1fd745ed99a648e  /tmp/cs144-received.bin
 ```
+
+后续：
+
+Wireshark 抓包显示说我的本机可以正常发出注册消息和承载以太网帧的 UDP 数据报，但是没观察到来自该地址的 UDP 响应和 ICMP 错误....所以可能失败的原因更可能与远端中继服务、返回路径或中间网络策略有关？（我也不清楚
+
+目前本机可以跑至少说明TCP、NetworkInterface 和 Router 的配合正常。
+
+<img src="./1.png" alt="image-20260603192432921" style="zoom:67%;" />
+<img src="./2.png" alt="image-20260603192432921" style="zoom:67%;" />
