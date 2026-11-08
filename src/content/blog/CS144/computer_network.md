@@ -263,14 +263,14 @@ void NetworkInterface::send_datagram( const InternetDatagram& dgram, const Addre
   }
 ```
 
-> 总体上就是：
+> 总体上就是：<br><br>
 >
->    目的 MAC 过滤
->        → 按 Ethernet type 分流
->       IPv4：解析 → 入队供上层读取
->       ARP：解析和校验 → 学习 IP/MAC
->             → 发送等待中的 IPv4 数据报
->             → 若请求的是本接口 IP，则回复 ARP
+> &emsp;目的 MAC 过滤<br>
+> &emsp;&emsp;→ 按 Ethernet type 分流<br>
+> &emsp;&emsp;IPv4：解析 → 入队供上层读取<br>
+> &emsp;&emsp;ARP：解析和校验 → 学习 IP/MAC<br>
+> &emsp;&emsp;&emsp;→ 发送等待中的 IPv4 数据报<br>
+> &emsp;&emsp;&emsp;→ 若请求的是本接口 IP，则回复 ARP
 
 ### tick()：计时与过期清理
 
@@ -469,11 +469,11 @@ const Address next_hop =
 interface(best->interface_num)->send_datagram(dgram, next_hop);
 ```
 
-> IPv4 首部
-> ├── 源 IP、目的 IP
-> ├── TTL
-> ├── 其他字段
-> └── 首部校验和：根据首部内容计算
+> IPv4 首部<br>
+> ├── 源 IP、目的 IP<br>
+> ├── TTL<br>
+> ├── 其他字段<br>
+> └── 首部校验和：根据首部内容计算<br><br>
 >
 > IPv4 首部校验和用于检测首部差错。TTL 是首部的一部分，路由器将其减一后，必须同步更新校验和，否则下一跳可能判定首部校验失败。该校验和只覆盖 IPv4 首部，不包含 payload。
 
